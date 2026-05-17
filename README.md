@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Songbook
 
-## Getting Started
+An offline-first, Progressive Web Application (PWA) built for musicians to manage and perform with chord sheets. 
 
-First, run the development server:
+## Features
+
+- **Offline First**: Fully functional without an internet connection. Songs and setlists are mirrored to IndexedDB locally, allowing you to perform anywhere, anytime. PWA support ensures the app can be installed directly to your home screen.
+- **Smart Chord Diagrams**: Click on any chord to see precise guitar shapes (via `react-guitar-chord`) and piano voicings (powered by `svg-piano` and `@tonaljs/tonal`).
+- **Performance Mode**: A clean, distraction-free view designed for live performances. Includes options to adjust font size, transpose on the fly, auto-scroll, and navigate page-by-page.
+- **Setlist Management**: Organize your songs into setlists, reorder them, add performance notes, and easily swipe through the entire set while on stage.
+- **ChordPro Support**: A robust editor with live preview that supports standard ChordPro tags, allowing you to quickly write or import songs.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS & shadcn/ui
+- **State Management**: Zustand
+- **Local Storage**: Dexie (IndexedDB)
+- **PWA Service Worker**: Serwist
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+
+## Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   *Note: PWA features (offline caching, install prompt) are disabled in development mode by Next.js/Turbopack.*
+
+## Production & Offline Testing
+
+To test the offline capabilities and see the "Install App" prompt, you must build and run the production server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run start:pwa
 ```
+This command runs `npm run build` followed by `npm start`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## License
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
