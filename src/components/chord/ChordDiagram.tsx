@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { renderGuitarSvg } from "@/lib/chord/diagrams/guitar";
-import { renderPianoSvg } from "@/lib/chord/diagrams/piano";
+// @ts-ignore
+import GuitarChord from "react-guitar-chord";
+import { SvgPianoRenderer } from "./SvgPiano";
 import {
   Dialog,
   DialogContent,
@@ -17,12 +18,27 @@ interface ChordDiagramProps {
   onOpenChange: (open: boolean) => void;
 }
 
+function ReactGuitarRenderer({ chord }: { chord: string }) {
+  const rootMatch = chord.match(/^([A-G][#b]?)/);
+  if (!rootMatch) return <div className="p-4 text-center">{chord}</div>;
+  const root = rootMatch[1];
+  const qualityStr = chord.slice(root.length);
+  const quality = qualityStr.includes("m") ? "MIN" : "MAJ";
+
+  return (
+    <div className="flex flex-col items-center fill-current stroke-current">
+      <GuitarChord chord={root} quality={quality} background="transparent" height="250" />
+      <span className="mt-2 text-sm font-bold text-foreground">{chord}</span>
+    </div>
+  );
+}
+
 export function ChordDiagram({ chord, open, onOpenChange }: ChordDiagramProps) {
   const [instrument, setInstrument] = useState<"guitar" | "piano">("guitar");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[320px]">
+      <DialogContent className="sm:max-w-xs">
         <DialogHeader>
           <DialogTitle>{chord}</DialogTitle>
         </DialogHeader>
@@ -34,17 +50,11 @@ export function ChordDiagram({ chord, open, onOpenChange }: ChordDiagramProps) {
             <TabsTrigger value="guitar">Guitar</TabsTrigger>
             <TabsTrigger value="piano">Piano</TabsTrigger>
           </TabsList>
-          <TabsContent value="guitar" className="flex justify-center pt-6 pb-2">
-            <div
-              className="text-foreground [&>svg]:w-32 [&>svg]:h-auto"
-              dangerouslySetInnerHTML={{ __html: renderGuitarSvg(chord, 140, 160) }}
-            />
+          <TabsContent value="guitar" className="flex justify-center pt-4 pb-2">
+            <ReactGuitarRenderer chord={chord} />
           </TabsContent>
-          <TabsContent value="piano" className="flex justify-center pt-8 pb-2">
-            <div
-              className="text-foreground w-full flex justify-center [&>svg]:w-full [&>svg]:h-auto"
-              dangerouslySetInnerHTML={{ __html: renderPianoSvg(chord, 300, 110) }}
-            />
+          <TabsContent value="piano" className="flex justify-center pt-4 pb-2">
+            <SvgPianoRenderer chordName={chord} />
           </TabsContent>
         </Tabs>
       </DialogContent>
