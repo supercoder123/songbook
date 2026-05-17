@@ -6,35 +6,16 @@ export interface GuitarChordProps {
 }
 
 const dbKeyMap: Record<string, string> = {
-  "C": "C",
-  "C#": "Csharp",
-  "Db": "Csharp",
-  "D": "D",
-  "D#": "Eb",
-  "Eb": "Eb",
-  "E": "E",
-  "F": "F",
-  "F#": "Fsharp",
-  "Gb": "Fsharp",
-  "G": "G",
-  "G#": "Ab",
-  "Ab": "Ab",
-  "A": "A",
-  "A#": "Bb",
-  "Bb": "Bb",
-  "B": "B"
+  "C": "C", "C#": "Csharp", "Db": "Csharp", "D": "D", "D#": "Eb", "Eb": "Eb",
+  "E": "E", "F": "F", "F#": "Fsharp", "Gb": "Fsharp", "G": "G", "G#": "Ab",
+  "Ab": "Ab", "A": "A", "A#": "Bb", "Bb": "Bb", "B": "B"
 };
 
 function normalizeSuffix(quality: string): string {
-  if (quality === "") return "major";
-  if (quality === "m") return "minor";
-  if (quality === "maj7") return "maj7";
-  if (quality === "m7") return "m7";
-  if (quality === "7") return "7";
-  if (quality === "dim") return "dim";
-  if (quality === "sus4") return "sus4";
-  if (quality === "sus2") return "sus2";
-  if (quality === "aug") return "aug";
+  const lower = quality.toLowerCase();
+  if (lower === "" || lower === "maj" || lower === "major") return "major";
+  if (lower === "m" || lower === "min" || lower === "-" || lower === "minor") return "minor";
+  if (lower === "maj7" || lower === "m7" || lower === "7" || lower === "dim" || lower === "dim7" || lower === "sus2" || lower === "sus4" || lower === "aug") return lower;
   return quality;
 }
 
@@ -101,7 +82,7 @@ export function GuitarChordRenderer({ chordName }: GuitarChordProps) {
                   
                   {/* Barre chords rendering */}
                   {barres.map((barreFret: number, bIdx: number) => {
-                    const displayFret = barreFret - baseFret + 1;
+                    const displayFret = barreFret; // Database barres are already relative to baseFret
                     if (displayFret >= 1 && displayFret <= 4) {
                       return (
                         <ellipse 
@@ -124,14 +105,14 @@ export function GuitarChordRenderer({ chordName }: GuitarChordProps) {
                     if (fret === -1) {
                       // Draw muted string X
                       return (
-                        <text key={stringIdx} x={cx - 4} y={23} fontSize="12" fill="currentColor" stroke="none" fontWeight="bold">
+                        <text key={stringIdx} x={cx} y={23} fontSize="14" fill="currentColor" stroke="none" fontWeight="bold" textAnchor="middle">
                           ×
                         </text>
                       );
                     } else if (fret === 0) {
                       // Draw open string O
                       return (
-                        <circle key={stringIdx} cx={cx} cy={18} r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                        <circle key={stringIdx} cx={cx} cy={16} r="4" fill="none" stroke="currentColor" strokeWidth="1.5" />
                       );
                     }
                     return null;
@@ -140,7 +121,7 @@ export function GuitarChordRenderer({ chordName }: GuitarChordProps) {
                   {/* Finger placements */}
                   {frets.map((fret: number, stringIdx: number) => {
                     if (fret > 0) {
-                      const displayFret = fret - baseFret + 1;
+                      const displayFret = fret; // Database frets are already relative to baseFret
                       if (displayFret >= 1 && displayFret <= 4) {
                         const cx = 26 + 30 * stringIdx;
                         const cy = 50 * displayFret;

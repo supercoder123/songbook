@@ -71,7 +71,12 @@ export function getPianoInversions(chordName: string): PianoInversion[] {
 
     const lowestNote = invNotes[0].midiNote;
     const lowestMidi = Note.midi(lowestNote)!;
-    const highestNote = Note.fromMidi(lowestMidi + 12);
+    
+    const highestNoteMidi = invNotes[invNotes.length - 1].midi;
+    
+    // Add extra keys on the left (5 semitones) and right (7 semitones) for readability
+    const expandedLowest = Note.fromMidi(Math.max(21, lowestMidi - 5));
+    const expandedHighest = Note.fromMidi(Math.min(108, highestNoteMidi + 7));
 
     const midiNotes = invNotes.map(n => n.midiNote);
     const labelsMap: Record<string, string> = {};
@@ -83,7 +88,7 @@ export function getPianoInversions(chordName: string): PianoInversion[] {
       name: names[k] || `${k}th Inversion`,
       midiNotes,
       labels: labelsMap,
-      range: [lowestNote, highestNote]
+      range: [expandedLowest, expandedHighest]
     });
   }
 
@@ -104,10 +109,11 @@ export function SvgPianoRenderer({ chordName }: { chordName: string }) {
           range: inv.range,
           scaleX: 1.2,
           scaleY: 1.2,
-          lowerHeight: 50,
-          upperHeight: 30,
+          lowerHeight: 35, // White keys extend 35 units below black keys
+          upperHeight: 65, // Black keys are much longer (65 units)
           palette: ["#18181b", "#ffffff"],
-          stroke: "#27272a",
+          stroke: "#18181b",
+          strokeWidth: 1,
           labels: inv.labels,
           topLabels: false,
           colorize: [
@@ -126,7 +132,10 @@ export function SvgPianoRenderer({ chordName }: { chordName: string }) {
           <div key={idx} className="flex flex-col items-center w-full border-b border-zinc-800 pb-4 last:border-0 last:pb-0">
             <span className="text-xs font-semibold text-amber-500 mb-2 uppercase tracking-wider">{inv.name}</span>
             <div className="bg-zinc-950 p-2 rounded-lg border border-zinc-800 overflow-x-auto w-full flex justify-center">
-              <svg width={rendered.svg.width} height={rendered.svg.height} viewBox={`0 0 ${rendered.svg.width} ${rendered.svg.height}`}>
+              <svg width="100%" height="auto" viewBox={`0 0 ${rendered.svg.width} ${rendered.svg.height}`}>
+                {/* Thick black felt line at the top to match design */}
+                <rect x="0" y="0" width="100%" height="4" fill="#18181b" />
+                
                 {rendered.children.map((child: any, i: number) => {
                   if (!child) return null;
                   return (
@@ -136,12 +145,27 @@ export function SvgPianoRenderer({ chordName }: { chordName: string }) {
                         fill={child.polygon.style.fill} 
                         stroke={child.polygon.style.stroke} 
                         strokeWidth={child.polygon.style.strokeWidth} 
+                        strokeLinejoin="round"
                       />
                       {child.circle && (
-                         <circle cx={child.circle.cx} cy={child.circle.cy} r={child.circle.r} fill={child.circle.fill} stroke={child.circle.stroke} strokeWidth={child.circle.strokeWidth} />
+                         <circle 
+                           cx={child.circle.cx} 
+                           cy={child.circle.cy} 
+                           r={child.circle.r} 
+                           fill={child.circle.fill} 
+                           stroke={child.circle.stroke} 
+                           strokeWidth={child.circle.strokeWidth} 
+                         />
                       )}
                       {child.text && (
-                         <text x={child.text.x} y={child.text.y} textAnchor={child.text.textAnchor} fontSize={child.text.fontSize} fill="#000" fontWeight="bold">
+                         <text 
+                           x={child.text.x} 
+                           y={child.text.y} 
+                           textAnchor={child.text.textAnchor} 
+                           fontSize={child.text.fontSize} 
+                           fill="#000000" 
+                           fontWeight="bold"
+                         >
                            {child.text.value}
                          </text>
                       )}

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlignJustify,
+  ArrowLeft,
   BookOpen,
   ChevronLeft,
   ChevronRight,
@@ -281,8 +282,8 @@ export function PerformanceShell({
             {/* Row 1 — Song info + nav + actions */}
             <div className="flex items-center gap-2 px-3 pb-2 border-b border-zinc-800">
               {/* Back */}
-              <Button variant="ghost" size="icon" className="shrink-0 text-zinc-400" onClick={() => router.back()}>
-                <X className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="shrink-0 text-zinc-400" onClick={() => router.back()} title="Exit performance mode">
+                <ArrowLeft className="h-4 w-4" />
               </Button>
 
               {/* Song title/artist */}
