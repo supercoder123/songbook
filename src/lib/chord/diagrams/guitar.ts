@@ -1,5 +1,4 @@
 import guitarDb from "@tombatossals/chords-db/lib/guitar.json";
-import piano from "@tombatossals/chords-db/lib/piano.json";
 
 export interface GuitarShape {
   frets: (number | "x")[];
