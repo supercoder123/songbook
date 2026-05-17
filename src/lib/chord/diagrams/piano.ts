@@ -13,12 +13,24 @@ export function getPianoNotes(chordName: string): number[] {
   }).filter(c => c !== -1);
 }
 
-export function renderPianoSvg(chord: string, width = 200, height = 80): string {
+export function renderPianoSvg(chord: string, width = 240, height = 100): string {
+  const parsedChord = Chord.get(chord);
   const notes = new Set(getPianoNotes(chord));
+  const noteNames = parsedChord.empty ? [] : parsedChord.notes;
+  
+  // Create a map of semitone to note name to display on the keys
+  const semiToName = new Map<number, string>();
+  noteNames.forEach(n => {
+    const chroma = Note.chroma(n);
+    if (chroma !== undefined && !semiToName.has(chroma)) {
+      semiToName.set(chroma, Note.pitchClass(n));
+    }
+  });
+
   const whiteCount = 14;
   const whiteWidth = width / whiteCount;
-  const blackWidth = whiteWidth * 0.6;
-  const blackHeight = height * 0.55;
+  const blackWidth = whiteWidth * 0.65;
+  const blackHeight = height * 0.6;
 
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
   svg += `<rect width="100%" height="100%" fill="transparent"/>`;
@@ -29,7 +41,11 @@ export function renderPianoSvg(chord: string, width = 200, height = 80): string 
       const note = (octave * 12 + semi) % 12;
       const x = whiteIndex * whiteWidth;
       const active = notes.has(note);
-      svg += `<rect x="${x}" y="0" width="${whiteWidth - 1}" height="${height}" fill="${active ? "#f59e0b" : "#f4f4f5"}" stroke="#27272a" rx="2"/>`;
+      svg += `<rect x="${x}" y="0" width="${whiteWidth}" height="${height}" fill="${active ? "#f59e0b" : "#ffffff"}" stroke="#27272a" stroke-width="1.5" rx="3"/>`;
+      if (active) {
+        const name = semiToName.get(note) || "";
+        svg += `<text x="${x + whiteWidth/2}" y="${height - 12}" text-anchor="middle" font-size="12" font-weight="bold" fill="${active ? "#000" : "transparent"}">${name}</text>`;
+      }
       whiteIndex++;
     }
   }
@@ -44,14 +60,18 @@ export function renderPianoSvg(chord: string, width = 200, height = 80): string 
         const x = (whiteIndex + 1) * whiteWidth - blackWidth / 2;
         const active = notes.has(blackNote);
         if (BLACK_OFFSETS.includes(blackNote % 12) || blackNote % 12 === 1) {
-          svg += `<rect x="${x}" y="0" width="${blackWidth}" height="${blackHeight}" fill="${active ? "#d97706" : "#18181b"}" stroke="#27272a" rx="2"/>`;
+          svg += `<rect x="${x}" y="0" width="${blackWidth}" height="${blackHeight}" fill="${active ? "#f59e0b" : "#18181b"}" stroke="#27272a" stroke-width="1.5" rx="2"/>`;
+          if (active) {
+            const name = semiToName.get(blackNote) || "";
+            svg += `<text x="${x + blackWidth/2}" y="${blackHeight - 8}" text-anchor="middle" font-size="10" font-weight="bold" fill="#000">${name}</text>`;
+          }
         }
       }
       whiteIndex++;
     }
   }
 
-  svg += `<text x="${width / 2}" y="${height - 4}" text-anchor="middle" font-size="11" font-weight="bold" fill="currentColor">${chord}</text>`;
+  // svg += `<text x="${width / 2}" y="12" text-anchor="middle" font-size="12" font-weight="bold" fill="#27272a">${chord}</text>`;
   svg += `</svg>`;
   return svg;
 }
